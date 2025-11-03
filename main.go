@@ -51,10 +51,29 @@ func calculateSimilarityPercentage(distance uint8) float64 {
 	return similarity
 }
 
+func interpretRelationship(distance uint8) string {
+	switch {
+	case distance == 0:
+		return "Identical"
+	case distance >= 1 && distance <= 3:
+		return "Near duplicates"
+	case distance >= 4 && distance <= 10:
+		return "Minor variants"
+	case distance >= 11 && distance <= 25:
+		return "Somewhat related"
+	case distance >= 26 && distance <= 38:
+		return "Unrelated"
+	case distance >= 39 && distance <= 64:
+		return "Maximally different"
+	default:
+		return "Unknown"
+	}
+}
+
 func main() {
 	files := []string{
-		"https:__github.com_anaskhan96_soup",
 		"https:__hexmos.com_freedevtools_",
+		"https:__hexmos.com_freedevtools_png_icons_nodewebkit_nodewebkit-line_",
 	}
 
 	// Create output folder with current date-time
@@ -102,6 +121,8 @@ func main() {
 
 	distance := simhash.Compare(hashes[0], hashes[1])
 	similarity := calculateSimilarityPercentage(distance)
+	relationship := interpretRelationship(distance)
 	fmt.Printf("Distance between file 1 and file 2: %d\n", distance)
 	fmt.Printf("Similarity percentage: %.2f%%\n", similarity)
+	fmt.Printf("Relationship: %s\n", relationship)
 }
