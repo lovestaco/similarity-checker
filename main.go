@@ -46,10 +46,16 @@ func removeHeaderFooter(content []byte) []byte {
 	return content
 }
 
+func calculateSimilarityPercentage(distance uint8) float64 {
+	const MAXIMUM = 1000.0
+	percentage := 100.0 - ((float64(distance) / MAXIMUM) * 100.0)
+	return percentage
+}
+
 func main() {
 	files := []string{
-		"https___hexmos.com_freedevtools_png_icons_nodewebkit_nodewebkit-plain_",
-		"https___hexmos.com_freedevtools_svg_icons_nodewebkit_nodewebkit-plain_",
+		"https:__hexmos.com_freedevtools_png_icons_nodewebkit_nodewebkit-line_",
+		"https:__hexmos.com_freedevtools_",
 	}
 
 	// Create output folder with current date-time
@@ -60,7 +66,6 @@ func main() {
 		fmt.Printf("Error creating output directory: %v\n", err)
 		return
 	}
-	fmt.Printf("Created output directory: %s\n", outputDir)
 
 	var docs [][]byte
 
@@ -71,11 +76,9 @@ func main() {
 			fmt.Printf("Error reading %s: %v\n", filename, err)
 			continue
 		}
-		fmt.Printf("Read %d bytes\n", len(body))
 
 		// Remove header and footer
 		cleaned := removeHeaderFooter(body)
-		fmt.Printf("After cleaning: %d bytes\n", len(cleaned))
 
 		// Save cleaned file to output directory
 		outputFilename := filepath.Join(outputDir, filename)
@@ -84,7 +87,6 @@ func main() {
 			fmt.Printf("Error writing cleaned file: %v\n", err)
 			continue
 		}
-		fmt.Printf("Saved cleaned file to: %s\n", outputFilename)
 		docs = append(docs, cleaned)
 	}
 
@@ -99,6 +101,8 @@ func main() {
 		fmt.Printf("Simhash of file %d: %x\n", i+1, hashes[i])
 	}
 
-	comparison := simhash.Compare(hashes[0], hashes[1])
-	fmt.Printf("Comparison of file 1 and file 2: %d (lower is more similar)\n", comparison)
+	distance := simhash.Compare(hashes[0], hashes[1])
+	similarity := calculateSimilarityPercentage(distance)
+	fmt.Printf("Distance between file 1 and file 2: %d\n", distance)
+	fmt.Printf("Similarity percentage: %.2f%%\n", similarity)
 }
