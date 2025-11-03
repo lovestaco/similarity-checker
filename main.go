@@ -47,14 +47,13 @@ func removeHeaderFooter(content []byte) []byte {
 }
 
 func calculateSimilarityPercentage(distance uint8) float64 {
-	const MAXIMUM = 1000.0
-	percentage := 100.0 - ((float64(distance) / MAXIMUM) * 100.0)
-	return percentage
+	similarity := float64(64-distance) / 64.0 * 100
+	return similarity
 }
 
 func main() {
 	files := []string{
-		"https:__hexmos.com_freedevtools_png_icons_nodewebkit_nodewebkit-line_",
+		"https:__github.com_anaskhan96_soup",
 		"https:__hexmos.com_freedevtools_",
 	}
 
@@ -98,7 +97,7 @@ func main() {
 	hashes := make([]uint64, len(docs))
 	for i, d := range docs {
 		hashes[i] = simhash.Simhash(simhash.NewWordFeatureSet(d))
-		fmt.Printf("Simhash of file %d: %x\n", i+1, hashes[i])
+		fmt.Printf("Simhash of file %d: %d\n", i+1, hashes[i])
 	}
 
 	distance := simhash.Compare(hashes[0], hashes[1])
